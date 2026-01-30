@@ -96,3 +96,44 @@ ts_gt_base <- function(gt_object,
 #' @rdname ts_gt_base
 #' @export
 si_gt_base <- ts_gt_base
+
+
+#' Compressed tableService theme
+#'
+#' A convenience wrapper around \code{\link{ts_gt_base}} that produces a
+#' tightly packed table suited for dashboards, slide decks, or any context
+#' where vertical space is at a premium. Applies minimal row padding, a
+#' smaller base font size, and compact column-label and source-note sizing.
+#'
+#' All arguments from \code{ts_gt_base()} are accepted via \code{...} so
+#' you can still override header colors, fonts, etc.
+#'
+#' @param gt_object An existing gt table object of class `gt_tbl`
+#' @param row_padding Row padding in pixels. Default is `1`.
+#' @param font_size Body font size in pixels. Default is `11`.
+#' @param ... Additional arguments passed to \code{\link{ts_gt_base}}
+#'
+#' @return An object of class `gt_tbl`.
+#' @export
+#'
+#' @examples
+#' # achv_data %>% gt() %>% ts_gt_compressed()
+#' # achv_data %>% gt() %>% ts_gt_compressed(header_fill = bdo_burgundy)
+ts_gt_compressed <- function(gt_object,
+                             row_padding = 1,
+                             font_size = 11,
+                             ...) {
+
+  gt_object %>%
+    ts_gt_base(...) %>%
+    gt::tab_options(
+      data_row.padding = gt::px(row_padding),
+      column_labels.font.size = gt::px(font_size),
+      source_notes.font.size = gt::px(8),
+      row_group.padding = gt::px(2)
+    ) %>%
+    gt::tab_style(
+      style = gt::cell_text(size = gt::px(font_size)),
+      locations = gt::cells_body()
+    )
+}

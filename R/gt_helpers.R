@@ -18,21 +18,39 @@ check_gt_object <- function(gt_object) {
 # Adjust table row padding
 #' adjust_row_padding
 #'
+#' @description
+#' Adjusts the vertical padding of data rows. Accepts either a preset keyword
+#' (`"condensed"`, `"regular"`, `"relaxed"`) or a custom pixel value via
+#' `gt::px()` for fine-grained control.
+#'
 #' @param gt_object An existing gt table object of class `gt_tbl`
-#' @param padding_setting Adjusts the density of the text in a table
+#' @param padding_setting Either a keyword (`"condensed"`, `"regular"`,
+#'   `"relaxed"`) or a numeric/px value (e.g. `gt::px(2)` or just `2`).
 #'
 #' @return An object of class `gt_tbl`.
 #' @export
 #'
 #' @examples
+#' # Keyword presets
+#' # achv_data %>% gt() %>% ts_gt_base() %>% adjust_row_padding("condensed")
+#'
+#' # Custom pixel value
+#' # achv_data %>% gt() %>% ts_gt_base() %>% adjust_row_padding(gt::px(2))
+#' # achv_data %>% gt() %>% ts_gt_base() %>% adjust_row_padding(1)
 adjust_row_padding <- function(gt_object, padding_setting = "regular") {
 
-  padding_setting <- match.arg(padding_setting, choices = c("condensed", "regular", "relaxed"))
-
-  padding_value <- switch(padding_setting,
-                          condensed = gt::px(3),  # Condensed padding
-                          regular = gt::px(7),    # Regular padding
-                          relaxed = gt::px(12))   # Relaxed padding
+  if (is.numeric(padding_setting)) {
+    padding_value <- gt::px(padding_setting)
+  } else if (is.character(padding_setting)) {
+    padding_setting <- match.arg(padding_setting, choices = c("condensed", "regular", "relaxed"))
+    padding_value <- switch(padding_setting,
+                            condensed = gt::px(3),
+                            regular = gt::px(7),
+                            relaxed = gt::px(12))
+  } else {
+    # Assume it's already a gt::px() object or similar
+    padding_value <- padding_setting
+  }
 
   gt_object %>%
     gt::tab_options(data_row.padding = padding_value)
