@@ -1,11 +1,14 @@
 # Creates a base tableService theme from which variations can be created
 #' tableService base theme
 #'
+#' Applies a BDO-branded base theme to a gt table object. Uses BDO color
+#' tokens for a consistent, professional look across all tables.
+#'
 #' @param gt_object An existing gt table object of class `gt_tbl`
-#' @param header_fill Fill color for the header background, defaults to deep navy
+#' @param header_fill Fill color for the header background, defaults to `bdo_slate_2` (`#5b6e7f`)
 #' @param header_font_color Font color for the header text, defaults to white
 #' @param table_font Font type as called from `google_font()`
-#' @param table_font_color Font color for the table body, defaults to dark charcoal
+#' @param table_font_color Font color for the table body, defaults to `bdo_charcoal` (`#333333`)
 #' @param ... Optional additional arguments to `gt::table_options()`
 #'
 #' @return An object of class `gt_tbl`.
@@ -13,16 +16,16 @@
 #'
 #' @examples
 ts_gt_base <- function(gt_object,
-                       header_fill = "#2C3E50",
+                       header_fill = bdo_slate_2,
                        header_font_color = "white",
-                       table_font = "Roboto",
-                       table_font_color = "#2C3E50",
+                       table_font = "Trebuchet MS",
+                       table_font_color = bdo_charcoal,
                        ...) {
 
   # Test that the object entered is in fact a gt object, if not it needs to be passed through gt()
   check_gt_object(gt_object)
 
-  # Base theme settings
+  # Base theme settings using BDO color system
   gt_object %>%
     gt::tab_options(
       heading.align = "left",
@@ -30,9 +33,9 @@ ts_gt_base <- function(gt_object,
       table.border.top.style = "none",
       column_labels.border.bottom.style = "none",
       column_labels.border.bottom.width = 1,
-      column_labels.border.bottom.color = "#1ABC9C",
+      column_labels.border.bottom.color = bdo_ocean2,
       table_body.border.top.style = "none",
-      table_body.border.bottom.color = "#BDC3C7",
+      table_body.border.bottom.color = bdo_pale_charcoal,
       table_body.hlines.width = 0,
       heading.border.bottom.style = "none",
       data_row.padding = gt::px(5),
@@ -48,15 +51,15 @@ ts_gt_base <- function(gt_object,
       ),
       locations = gt::cells_column_labels(tidyselect::everything())
     ) %>%
-    # Create a header filled with our deep navy color
+    # Header fill using BDO slate
     gt::tab_style(
       style = gt::cell_fill(color = header_fill),
       locations = gt::cells_column_labels(tidyselect::everything())
     ) %>%
-    # Table header font
+    # Table title font
     gt::tab_style(
       style = gt::cell_text(
-        color = table_font_color, font = gt::google_font("Roboto Slab"), weight = 750,
+        color = table_font_color, font = gt::google_font("Trebuchet MS"), weight = 750,
         transform = "uppercase"
       ),
       locations = gt::cells_title(groups = "title")

@@ -12,10 +12,13 @@ The `tableService` package makes it easy to create pre-formatted gt tables with 
 clean, modern aesthetic. It provides a base theme, formatting helpers, and utility
 functions for building publication-ready tables.
 
-**New Color Scheme:**
-- Deep navy headers (`#2C3E50`)
-- Teal accents (`#1ABC9C`)
-- Clean typography with Roboto font family
+**BDO Color Scheme:**
+- Slate headers (`#5b6e7f` - `bdo_slate_2`)
+- Ocean accent borders (`#008fd2` - `bdo_ocean2`)
+- Charcoal body text (`#333333` - `bdo_charcoal`)
+- Neutral pale row striping (`#EEF4F3` - `bdo_neutral_pale`)
+- Typography with Trebuchet MS font family
+- Full BDO palette system with tint ramps and diverging scales
 
 ### Installing tableService
 

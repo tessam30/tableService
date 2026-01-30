@@ -45,13 +45,13 @@ adjust_row_padding <- function(gt_object, padding_setting = "regular") {
 #' Add faint row striping to a table based on your color of choice.
 #'
 #' @param gt_object An existing gt table object of class `gt_tbl`
-#' @param stripe_color Fill color for the stripes, defaults to cloud white
+#' @param stripe_color Fill color for the stripes, defaults to `bdo_neutral_pale` (`#EEF4F3`)
 #'
 #' @return An object of class `gt_tbl`.
 #' @export
 #'
 #' @examples
-apply_row_striping <- function(gt_object, stripe_color = "#ECF0F1") {
+apply_row_striping <- function(gt_object, stripe_color = bdo_neutral_pale) {
   gt_object %>%
     gt::tab_options(
       row.striping.include_table_body = TRUE,
