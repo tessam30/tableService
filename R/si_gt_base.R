@@ -9,9 +9,11 @@
 #' @param header_font_color Font color for the header text, defaults to white
 #' @param table_font Font type as called from `google_font()`
 #' @param table_font_color Font color for the table body, defaults to `bdo_charcoal` (`#333333`)
-#' @param uppercase Logical. If `TRUE` (default), column labels, title, row
-#'   groups and stub text are transformed to uppercase. Set to `FALSE` to
-#'   preserve original casing.
+#' @param text_case Text transform applied to column labels, title, row
+#'   groups, and stub text. One of `"uppercase"` (default), `"lowercase"`,
+#'   `"capitalize"`, or `"none"` to preserve original casing. Also
+#'   accepts `TRUE` (same as `"uppercase"`) and `FALSE` (same as `"none"`)
+#'   for convenience.
 #' @param ... Optional additional arguments to `gt::table_options()`
 #'
 #' @return An object of class `gt_tbl`.
@@ -21,23 +23,32 @@
 #' # Default (uppercase headers)
 #' # achv_data %>% gt() %>% ts_gt_base()
 #'
+#' # Capitalize first letter only
+#' # achv_data %>% gt() %>% ts_gt_base(text_case = "capitalize")
+#'
 #' # Preserve original casing
-#' # achv_data %>% gt() %>% ts_gt_base(uppercase = FALSE)
+#' # achv_data %>% gt() %>% ts_gt_base(text_case = "none")
 ts_gt_base <- function(gt_object,
                        header_fill = "#5b6e7f",
                        header_font_color = "white",
                        table_font = "Trebuchet MS",
                        table_font_color = "#333333",
-                       uppercase = TRUE,
+                       text_case = "uppercase",
                        ...) {
 
   # Test that the object entered is in fact a gt object, if not it needs to be passed through gt()
   check_gt_object(gt_object)
 
-  # Helper: build cell_text with optional uppercase transform
-  styled_text <- function(..., transform_eligible = TRUE) {
-    if (uppercase && transform_eligible) {
-      gt::cell_text(..., transform = "uppercase")
+  # Accept TRUE/FALSE for backward compatibility
+  if (is.logical(text_case)) {
+    text_case <- if (text_case) "uppercase" else "none"
+  }
+  text_case <- match.arg(text_case, choices = c("uppercase", "lowercase", "capitalize", "none"))
+
+  # Helper: build cell_text with optional text transform
+  styled_text <- function(...) {
+    if (text_case != "none") {
+      gt::cell_text(..., transform = text_case)
     } else {
       gt::cell_text(...)
     }
@@ -127,14 +138,14 @@ si_gt_base <- ts_gt_base
 #' @param row_padding Row padding in pixels. Default is `1`.
 #' @param font_size Body font size in pixels. Default is `11`.
 #' @param ... Additional arguments passed to \code{\link{ts_gt_base}}
-#'   (e.g. `uppercase = FALSE`, `header_fill = bdo_burgundy`)
+#'   (e.g. `text_case = "capitalize"`, `header_fill = bdo_burgundy`)
 #'
 #' @return An object of class `gt_tbl`.
 #' @export
 #'
 #' @examples
 #' # achv_data %>% gt() %>% ts_gt_compressed()
-#' # achv_data %>% gt() %>% ts_gt_compressed(uppercase = FALSE)
+#' # achv_data %>% gt() %>% ts_gt_compressed(text_case = "none")
 #' # achv_data %>% gt() %>% ts_gt_compressed(header_fill = bdo_burgundy)
 ts_gt_compressed <- function(gt_object,
                              row_padding = 1,
