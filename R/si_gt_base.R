@@ -34,7 +34,14 @@ ts_gt_base <- function(gt_object,
   # Test that the object entered is in fact a gt object, if not it needs to be passed through gt()
   check_gt_object(gt_object)
 
-  text_transform <- if (uppercase) "uppercase" else "none"
+  # Helper: build cell_text with optional uppercase transform
+  styled_text <- function(..., transform_eligible = TRUE) {
+    if (uppercase && transform_eligible) {
+      gt::cell_text(..., transform = "uppercase")
+    } else {
+      gt::cell_text(...)
+    }
+  }
 
   # Base theme settings using BDO color system
   gt_object %>%
@@ -56,9 +63,9 @@ ts_gt_base <- function(gt_object,
       ...
     ) %>%
     gt::tab_style(
-      style = gt::cell_text(
+      style = styled_text(
         color = header_font_color, font = gt::google_font(table_font),
-        weight = 700, transform = text_transform
+        weight = 700
       ),
       locations = gt::cells_column_labels(tidyselect::everything())
     ) %>%
@@ -69,9 +76,8 @@ ts_gt_base <- function(gt_object,
     ) %>%
     # Table title font
     gt::tab_style(
-      style = gt::cell_text(
-        color = table_font_color, font = gt::google_font("Trebuchet MS"), weight = 750,
-        transform = text_transform
+      style = styled_text(
+        color = table_font_color, font = gt::google_font("Trebuchet MS"), weight = 750
       ),
       locations = gt::cells_title(groups = "title")
     ) %>%
@@ -82,17 +88,15 @@ ts_gt_base <- function(gt_object,
     ) %>%
     # Row group headers
     gt::tab_style(
-      style = gt::cell_text(
-        color = table_font_color, font = gt::google_font(table_font), weight = 600,
-        transform = text_transform
+      style = styled_text(
+        color = table_font_color, font = gt::google_font(table_font), weight = 600
       ),
       locations = gt::cells_row_groups()
     ) %>%
     # Stub text
     gt::tab_style(
-      style = gt::cell_text(
-        color = table_font_color, font = gt::google_font(table_font), weight = 500,
-        transform = text_transform
+      style = styled_text(
+        color = table_font_color, font = gt::google_font(table_font), weight = 500
       ),
       locations = gt::cells_stub()
     ) %>%
