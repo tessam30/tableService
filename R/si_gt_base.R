@@ -9,21 +9,32 @@
 #' @param header_font_color Font color for the header text, defaults to white
 #' @param table_font Font type as called from `google_font()`
 #' @param table_font_color Font color for the table body, defaults to `bdo_charcoal` (`#333333`)
+#' @param uppercase Logical. If `TRUE` (default), column labels, title, row
+#'   groups and stub text are transformed to uppercase. Set to `FALSE` to
+#'   preserve original casing.
 #' @param ... Optional additional arguments to `gt::table_options()`
 #'
 #' @return An object of class `gt_tbl`.
 #' @export
 #'
 #' @examples
+#' # Default (uppercase headers)
+#' # achv_data %>% gt() %>% ts_gt_base()
+#'
+#' # Preserve original casing
+#' # achv_data %>% gt() %>% ts_gt_base(uppercase = FALSE)
 ts_gt_base <- function(gt_object,
                        header_fill = "#5b6e7f",
                        header_font_color = "white",
                        table_font = "Trebuchet MS",
                        table_font_color = "#333333",
+                       uppercase = TRUE,
                        ...) {
 
   # Test that the object entered is in fact a gt object, if not it needs to be passed through gt()
   check_gt_object(gt_object)
+
+  text_transform <- if (uppercase) "uppercase" else "none"
 
   # Base theme settings using BDO color system
   gt_object %>%
@@ -47,7 +58,7 @@ ts_gt_base <- function(gt_object,
     gt::tab_style(
       style = gt::cell_text(
         color = header_font_color, font = gt::google_font(table_font),
-        weight = 700, transform = "uppercase"
+        weight = 700, transform = text_transform
       ),
       locations = gt::cells_column_labels(tidyselect::everything())
     ) %>%
@@ -60,7 +71,7 @@ ts_gt_base <- function(gt_object,
     gt::tab_style(
       style = gt::cell_text(
         color = table_font_color, font = gt::google_font("Trebuchet MS"), weight = 750,
-        transform = "uppercase"
+        transform = text_transform
       ),
       locations = gt::cells_title(groups = "title")
     ) %>%
@@ -73,7 +84,7 @@ ts_gt_base <- function(gt_object,
     gt::tab_style(
       style = gt::cell_text(
         color = table_font_color, font = gt::google_font(table_font), weight = 600,
-        transform = "uppercase"
+        transform = text_transform
       ),
       locations = gt::cells_row_groups()
     ) %>%
@@ -81,7 +92,7 @@ ts_gt_base <- function(gt_object,
     gt::tab_style(
       style = gt::cell_text(
         color = table_font_color, font = gt::google_font(table_font), weight = 500,
-        transform = "uppercase"
+        transform = text_transform
       ),
       locations = gt::cells_stub()
     ) %>%
@@ -106,18 +117,20 @@ si_gt_base <- ts_gt_base
 #' smaller base font size, and compact column-label and source-note sizing.
 #'
 #' All arguments from \code{ts_gt_base()} are accepted via \code{...} so
-#' you can still override header colors, fonts, etc.
+#' you can still override header colors, fonts, uppercase, etc.
 #'
 #' @param gt_object An existing gt table object of class `gt_tbl`
 #' @param row_padding Row padding in pixels. Default is `1`.
 #' @param font_size Body font size in pixels. Default is `11`.
 #' @param ... Additional arguments passed to \code{\link{ts_gt_base}}
+#'   (e.g. `uppercase = FALSE`, `header_fill = bdo_burgundy`)
 #'
 #' @return An object of class `gt_tbl`.
 #' @export
 #'
 #' @examples
 #' # achv_data %>% gt() %>% ts_gt_compressed()
+#' # achv_data %>% gt() %>% ts_gt_compressed(uppercase = FALSE)
 #' # achv_data %>% gt() %>% ts_gt_compressed(header_fill = bdo_burgundy)
 ts_gt_compressed <- function(gt_object,
                              row_padding = 1,
