@@ -1,0 +1,28 @@
+Package: tableService
+Title: Adorns gt objects with custom styles for polished tables
+Version: 0.1.0
+Authors@R:
+    person("Tim", "Essam", , "tim.essam@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: tableService offers an assortment of pre-set styles to adorn gt objects
+    with a modern, polished look. Provides theming, formatting, and helper
+    functions for creating publication-ready tables.
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.3.1
+Imports:
+    cli,
+    dplyr,
+    glue,
+    gt,
+    magrittr,
+    purrr,
+    tidyselect
+Suggests:
+    knitr
+Depends:
+    R (>= 2.10)
+LazyData: true
+BuildVignettes: false
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
