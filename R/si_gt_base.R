@@ -16,10 +16,10 @@
 #'
 #' @examples
 ts_gt_base <- function(gt_object,
-                       header_fill = bdo_slate_2,
+                       header_fill = "#5b6e7f",
                        header_font_color = "white",
                        table_font = "Trebuchet MS",
-                       table_font_color = bdo_charcoal,
+                       table_font_color = "#333333",
                        ...) {
 
   # Test that the object entered is in fact a gt object, if not it needs to be passed through gt()
@@ -33,9 +33,9 @@ ts_gt_base <- function(gt_object,
       table.border.top.style = "none",
       column_labels.border.bottom.style = "none",
       column_labels.border.bottom.width = 1,
-      column_labels.border.bottom.color = bdo_ocean2,
+      column_labels.border.bottom.color = "#008fd2",
       table_body.border.top.style = "none",
-      table_body.border.bottom.color = bdo_pale_charcoal,
+      table_body.border.bottom.color = "#e7e7e7",
       table_body.hlines.width = 0,
       heading.border.bottom.style = "none",
       data_row.padding = gt::px(5),

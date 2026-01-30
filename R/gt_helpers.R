@@ -51,7 +51,7 @@ adjust_row_padding <- function(gt_object, padding_setting = "regular") {
 #' @export
 #'
 #' @examples
-apply_row_striping <- function(gt_object, stripe_color = bdo_neutral_pale) {
+apply_row_striping <- function(gt_object, stripe_color = "#EEF4F3") {
   gt_object %>%
     gt::tab_options(
       row.striping.include_table_body = TRUE,
