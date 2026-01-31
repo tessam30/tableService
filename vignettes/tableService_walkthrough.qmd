@@ -1,0 +1,569 @@
+---
+title: "tableService: A Complete Walkthrough"
+subtitle: "BDO-branded gt tables from start to finish"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(tableService)
+library(gt)
+library(dplyr)
+```
+
+## Overview
+
+`tableService` is an R package for creating polished, BDO-branded gt tables. It provides:
+
+- **Themes** — `ts_gt_base()` and `ts_gt_compressed()` for consistent styling
+- **Color system** — 17 BDO color tokens and 5 palette ramps, all exported individually
+- **Formatting helpers** — numeric formatting, percent change, cell coloring
+- **Structural tools** — spanners, merged cells, row highlighting, horizontal rules
+- **Output** — save tables to HTML or PNG with `ts_save()`
+
+This walkthrough demonstrates every function in the package using the bundled `achv_data` dataset.
+
+## The example data
+
+`achv_data` contains program indicators for two operating units with results, targets, and achievement rates.
+
+```{r}
+achv_data
+```
+
+---
+
+## 1. BDO Color System
+
+All 17 color tokens are exported individually so you can use them directly.
+
+```{r}
+# Individual tokens
+bdo_ocean_deep
+bdo_jade
+bdo_burgundy
+```
+
+```{r}
+# Named vector of all tokens
+bdo_colors
+```
+
+```{r}
+# Palette list (tint ramps + diverging)
+str(bdo_palettes)
+```
+
+---
+
+## 2. Base Theme: `ts_gt_base()`
+
+The foundation for all tables. Applies BDO slate header, charcoal body text, ocean accent border, and Trebuchet MS font.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base()
+```
+
+### Custom header colors
+
+Override `header_fill` with any BDO token:
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base(header_fill = bdo_ocean_deep)
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base(header_fill = bdo_burgundy)
+```
+
+### Text case control
+
+The `text_case` parameter controls casing for column labels, title, row groups, and stub. Options: `"uppercase"` (default), `"lowercase"`, `"capitalize"`, or `"none"`.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base(text_case = "capitalize") %>%
+  add_labs(title = "Capitalize Example",
+           subtitle = "First letter of each word is capitalized")
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base(text_case = "none") %>%
+  add_labs(title = "Original Casing Preserved",
+           subtitle = "No text transform applied")
+```
+
+---
+
+## 3. Compressed Theme: `ts_gt_compressed()`
+
+A tightly packed variant for dashboards and slides. Wraps `ts_gt_base()` with 1px row padding, 11px font, and compact spacing. All `ts_gt_base()` arguments pass through.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_compressed()
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_compressed(
+    header_fill = bdo_jade_deep,
+    text_case = "capitalize"
+  )
+```
+
+---
+
+## 4. Titles and Source Notes: `add_labs()`
+
+Quick way to add a title, subtitle, and source note.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  add_labs(
+    title = "Program Achievement Summary",
+    subtitle = "FY24 Cumulative Results",
+    caption = "Source: DATIM | Produced with tableService"
+  )
+```
+
+---
+
+## 5. Numeric Formatting: `format_numeric_columns()`
+
+Automatically formats whole numbers with commas and decimals as percentages.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns()
+```
+
+---
+
+## 6. Column Alignment: `align_columns()`
+
+Text columns left-aligned, numeric columns right-aligned.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  align_columns()
+```
+
+---
+
+## 7. Row Padding: `adjust_row_padding()`
+
+Accepts keyword presets or custom pixel values.
+
+::: {.panel-tabset}
+
+### Condensed
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  adjust_row_padding("condensed")
+```
+
+### Regular (default)
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  adjust_row_padding("regular")
+```
+
+### Relaxed
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  adjust_row_padding("relaxed")
+```
+
+### Custom (2px)
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  adjust_row_padding(2)
+```
+
+:::
+
+---
+
+## 8. Row Striping: `apply_row_striping()`
+
+Alternating row backgrounds. Defaults to `bdo_neutral_pale`; pass any color to customize.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  apply_row_striping()
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  apply_row_striping(stripe_color = bdo_ocean_soft)
+```
+
+---
+
+## 9. Darken Column Headers: `drkn_clmn_hdr()`
+
+Override column header text color independently from the theme.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base(header_fill = bdo_pale_charcoal) %>%
+  drkn_clmn_hdr(bdo_charcoal)
+```
+
+---
+
+## 10. Grouped Rows
+
+Use `gt(groupname_col = ...)` with any tableService theme. Row group labels inherit the BDO styling automatically.
+
+```{r}
+achv_data %>%
+  gt(groupname_col = "operating_unit") %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  align_columns() %>%
+  apply_row_striping()
+```
+
+---
+
+## 11. Directional Arrows: `add_arrow_column_gt()`
+
+Append a colored arrow column comparing values against a baseline or another column. Uses `bdo_jade` (up) and `bdo_red` (down) by default.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  add_arrow_column_gt(Achievement, baseline = 0.90)
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  add_arrow_column_gt(Result, compare_to = Target,
+                      up_color = bdo_ocean_deep,
+                      down_color = bdo_gold)
+```
+
+---
+
+## 12. Rate Column: `rate_column()`
+
+Color a numeric column by pass/fail threshold.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  rate_column(Achievement, threshold = 0.90)
+```
+
+---
+
+## 13. Color Cells by Breakpoints: `ts_color_cells()`
+
+Apply background fills to a numeric column based on breakpoints — great for heatmap-style tables. Supply `n` breakpoints and `n + 1` colors.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_color_cells(
+    Achievement,
+    breaks = c(0.5, 0.85, 1.0),
+    colors = c(bdo_red_soft, bdo_gold_muted, bdo_jade_soft, bdo_ocean_soft),
+    text_color = bdo_charcoal
+  )
+```
+
+---
+
+## 14. Highlight Rows: `ts_highlight_rows()`
+
+Highlight entire rows by matching a column value or by row index.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_highlight_rows(
+    match_col = "operating_unit",
+    match_val = "Minoria",
+    fill_color = bdo_ocean_soft
+  )
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  ts_highlight_rows(rows = c(1, 6), fill_color = bdo_jade_soft, bold = TRUE)
+```
+
+---
+
+## 15. Bold Summary Row: `ts_gt_bold_sumrow()`
+
+Bold and border a total or summary row. Identify by row index or by matching a label.
+
+```{r}
+# Add a total row for demonstration
+achv_summary <- achv_data %>%
+  bind_rows(
+    tibble(operating_unit = "Total", program_area = "",
+           indicator = "", Result = sum(achv_data$Result),
+           Target = sum(achv_data$Target),
+           Achievement = sum(achv_data$Result) / sum(achv_data$Target))
+  )
+
+achv_summary %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_gt_bold_sumrow(match_col = "operating_unit", match_val = "Total",
+                    fill_color = bdo_neutral_pale)
+```
+
+---
+
+## 16. Percent Change Formatting: `ts_fmt_pct_change()`
+
+Formats a numeric column with +/- signs and colored text. Green for gains, red for losses.
+
+```{r}
+# Create sample data with changes
+change_data <- tibble(
+  indicator = c("HTS_TST", "TX_NEW", "TX_CURR", "PrEP_NEW"),
+  current = c(15000, 8200, 42000, 3100),
+  previous = c(13500, 9000, 40000, 2800),
+  pct_change = (current - previous) / previous
+)
+
+change_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_fmt_pct_change(pct_change)
+```
+
+---
+
+## 17. Merge & Stack Columns: `ts_merge_stack()`
+
+Merge two columns into one cell — primary value on top, secondary below in smaller, lighter text.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  ts_merge_stack(indicator, program_area) %>%
+  format_numeric_columns()
+```
+
+---
+
+## 18. Themed Spanners: `ts_spanner()`
+
+Add a column spanner that inherits BDO font styling.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_spanner("Performance Metrics", columns = c(Result, Target, Achievement))
+```
+
+With a custom fill color:
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_spanner("Performance Metrics",
+             columns = c(Result, Target, Achievement),
+             fill_color = bdo_ocean_deep)
+```
+
+---
+
+## 19. Horizontal Rules: `ts_hline()`
+
+Insert visual separators between rows without using row groups.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_hline(rows = 7, color = bdo_ocean2, weight = 2)
+```
+
+---
+
+## 20. Footnotes: `ts_footnote()`
+
+Attach footnotes to column headers or specific cells.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_footnote("Cumulative FY24 results", columns = Result) %>%
+  ts_footnote("FY24 DATIM targets", columns = Target)
+```
+
+```{r}
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  ts_footnote("Preliminary data", columns = Achievement, rows = c(1, 2))
+```
+
+---
+
+## 21. Saving Tables: `ts_save()`
+
+Save to HTML or PNG. Automatically creates the output directory.
+
+```{r}
+#| eval: false
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  format_numeric_columns() %>%
+  add_labs(title = "My Report Table") %>%
+  ts_save("my_table.html")
+
+# PNG output
+achv_data %>%
+  gt() %>%
+  ts_gt_base() %>%
+  ts_save("my_table.png")
+```
+
+---
+
+## 22. Backward Compatibility: `si_gt_base()`
+
+`si_gt_base()` is an alias for `ts_gt_base()`. Existing code using the old name will continue to work.
+
+```{r}
+achv_data %>%
+  gt() %>%
+  si_gt_base() %>%
+  add_labs(title = "Same as ts_gt_base()")
+```
+
+---
+
+## Putting it all together
+
+A kitchen-sink example combining multiple features:
+
+```{r}
+achv_data %>%
+  gt(groupname_col = "operating_unit") %>%
+  ts_gt_base(text_case = "capitalize") %>%
+  ts_merge_stack(indicator, program_area) %>%
+  format_numeric_columns() %>%
+  align_columns() %>%
+  apply_row_striping() %>%
+  adjust_row_padding("condensed") %>%
+  rate_column(Achievement, threshold = 0.90) %>%
+  ts_spanner("Performance", columns = c(Result, Target, Achievement)) %>%
+  ts_footnote("Cumulative FY24", columns = Result) %>%
+  add_labs(
+    title = "Program Achievement Dashboard",
+    subtitle = "FY24 Cumulative | All Operating Units",
+    caption = "Source: DATIM | Produced with tableService"
+  )
+```
+
+---
+
+## Function Reference
+
+| Function | Purpose |
+|---|---|
+| **Themes** | |
+| `ts_gt_base()` | Base BDO-branded theme |
+| `ts_gt_compressed()` | Dense variant for dashboards |
+| `si_gt_base()` | Alias for `ts_gt_base()` |
+| **Formatting** | |
+| `format_numeric_columns()` | Auto-format integers (commas) and decimals (%) |
+| `ts_fmt_pct_change()` | +/- percent change with color |
+| `align_columns()` | Text left, numbers right |
+| `adjust_row_padding()` | Keywords or custom px |
+| **Styling** | |
+| `apply_row_striping()` | Alternating row backgrounds |
+| `rate_column()` | Pass/fail color by threshold |
+| `ts_color_cells()` | Heatmap fills by breakpoints |
+| `ts_highlight_rows()` | Highlight rows by value or index |
+| `ts_gt_bold_sumrow()` | Bold a summary/total row |
+| `drkn_clmn_hdr()` | Override header text color |
+| `add_arrow_column_gt()` | Directional arrows with color |
+| **Structure** | |
+| `ts_merge_stack()` | Stack two columns in one cell |
+| `ts_spanner()` | Themed column spanner |
+| `ts_hline()` | Horizontal rule between rows |
+| `ts_footnote()` | Footnotes on headers or cells |
+| `add_labs()` | Title, subtitle, source note |
+| **Output** | |
+| `ts_save()` | Save to HTML or PNG |
+| **Colors** | |
+| `bdo_colors` | Named vector of 17 BDO tokens |
+| `bdo_palettes` | List of 5 palette ramps |
+| `bdo_*` | 17 individual tokens + 5 palette vectors |
